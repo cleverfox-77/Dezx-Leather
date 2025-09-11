@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Guide: Upload Website to GitHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #24292e 0%, #0d1117 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            margin-bottom: 15px;
+            font-size: 2.8rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .github-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .steps-container {
+            padding: 40px;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 40px;
+            border-left: 4px solid #28a745;
+            padding-left: 25px;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            position: absolute;
+            left: -25px;
+            top: -10px;
+            background-color: #28a745;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step h3 {
+            margin-bottom: 15px;
+            color: #24292e;
+            font-size: 1.5rem;
+        }
+        
+        .step p {
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 18px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #0366d6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .code-block code {
+            color: #24292e;
+            line-height: 1.5;
+        }
+        
+        .command {
+            color: #0366d6;
+            font-weight: bold;
+        }
+        
+        .comment {
+            color: #6a737d;
+        }
+        
+        .url {
+            color: #032f62;
+        }
+        
+        .note {
+            background-color: #fff9c4;
+            border-left: 4px solid #ffd600;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        
+        .note h4 {
+            color: #5a3e01;
+            margin-bottom: 10px;
+        }
+        
+        .practice-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 40px 0;
+            text-align: center;
+            border: 2px dashed #2196f3;
+        }
+        
+        .practice-section h3 {
+            color: #0d47a1;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #24292e;
+            color: white;
+        }
+        
+        .diagram {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .diagram img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .caption {
+            font-style: italic;
+            margin-top: 10px;
+            color: #6a737d;
+        }
+        
+        @media (max-width: 768px) {
+            .step {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .steps-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="github-icon">🐙</div>
+            <h1>How to Upload Your Website to GitHub</h1>
+            <p>A comprehensive step-by-step guide to hosting your website with GitHub Pages</p>
+        </header>
+        
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Create a GitHub Account</h3>
+                    <p>If you don't have one already, go to <a href="https://github.com/" target="_blank">github.com</a> and sign up for a free account. Choose a username that you'll be comfortable sharing professionally.</p>
+                    <div class="note">
+                        <h4>Pro Tip</h4>
+                        <p>Your username will be part of your GitHub Pages URL (username.github.io), so choose wisely!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Install Git on Your Computer</h3>
+                    <p>Download and install Git from the official website:</p>
+                    <div class="code-block">
+                        <code><a href="https://git-scm.com/downloads" target="_blank">https://git-scm.com/downloads</a></code>
+                    </div>
+                    <p>After installation, verify it's working by opening a terminal/command prompt and typing:</p>
+                    <div class="code-block">
+                        <code><span class="command">git</span> --version</code>
+                    </div>
+                    <p>Configure Git with your name and email (use the same email you used for GitHub):</p>
+                    <div class="code-block">
+                        <code><span class="command">git</span> config --global user.name <span class="url">"Your Name"</span></code>
+                        <code><span class="command">git</span> config --global user.email <span class="url">"your.email@example.com"</span></code>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Create a New Repository</h3>
+                    <p>On GitHub, click the "+" icon in the top right and select "New repository".</p>
+                    <p>Name your repository <strong>username.github.io</strong> (replace "username" with your GitHub username). This is important for GitHub Pages.</p>
+                    <p>Make sure to set the repository to "Public" and initialize it with a README.</p>
+                    <div class="note">
+                        <h4>Important</h4>
+                        <p>For your first GitHub Pages site, the repository must be named exactly as your username followed by .github.io</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Clone the Repository to Your Computer</h3>
+                    <p>On your repository page, click the "Code" button and copy the URL.</p>
+                    <p>Open a terminal/command prompt, navigate to where you want to store your project, and type:</p>
+                    <div class="code-block">
+                        <code><span class="command">git</span> clone <span class="url">https://github.com/cleverfox-77/cleverfox-77.github.io.git</span></code>
+                    </div>
+                    <p>Replace the URL with your actual repository URL.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Add Your Website Files</h3>
+                    <p>Copy all your website files (HTML, CSS, JS, images, etc.) into the cloned repository folder.</p>
+                    <p>Make sure your main page is named <strong>index.html</strong> as this is the default file GitHub Pages will look for.</p>
+                    <div class="note">
+                        <h4>File Structure</h4>
+                        <p>Your repository should have an index.html file at the root. Other files can be organized in folders like css/, js/, images/, etc.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <h3>Commit and Push Your Files</h3>
+                    <p>In the terminal, navigate to your repository folder and run these commands:</p>
+                    <div class="code-block">
+                        <code><span class="command">git</span> add . <span class="comment"># Stages all your files for commit</span></code>
+                        <code><span class="command">git</span> commit -m <span class="url">"Initial commit - adding my website"</span> <span class="comment"># Commits the files with a message</span></code>
+                        <code><span class="command">git</span> push origin main <span class="comment"># Pushes the files to GitHub</span></code>
+                    </div>
+                    <p>You may be prompted to enter your GitHub username and password (or personal access token).</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">7</div>
+                <div class="step-content">
+                    <h3>Enable GitHub Pages</h3>
+                    <p>Go to your repository on GitHub, click on "Settings", then select "Pages" from the left sidebar.</p>
+                    <p>Under "Source", select the "main" branch and click "Save".</p>
+                    <div class="note">
+                        <h4>Note</h4>
+                        <p>If your repository is named correctly (username.github.io), GitHub Pages will be automatically enabled, but it's good to check the settings.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">8</div>
+                <div class="step-content">
+                    <h3>Access Your Website</h3>
+                    <p>Your website will now be live at:</p>
+                    <div class="code-block">
+                        <code>https://cleverfox-77.github.io</code>
+                    </div>
+                    <p>It might take a few minutes for your site to be available after the first deployment.</p>
+                </div>
+            </div>
+            
+            <div class="note">
+                <h3>Important Note</h3>
+                <p>If you want to use a custom domain instead of username.github.io, you can configure it in the GitHub Pages settings. You'll also need to add a CNAME file to your repository and configure DNS settings with your domain registrar.</p>
+            </div>
+            
+            <div class="practice-section">
+                <h3>Practice with This Sample Website</h3>
+                <p>You can use the HTML code of this page as your first website to upload to GitHub. Just right-click on the page, select "View Page Source", copy the entire code, and paste it into an index.html file in your repository.</p>
+                <p>Alternatively, you can create your own simple HTML file:</p>
+                <div class="code-block">
+                    <code>&lt;!DOCTYPE html&gt;<br>
+&lt;html&gt;<br>
+&lt;head&gt;<br>
+&nbsp;&nbsp;&lt;title&gt;My First GitHub Website&lt;/title&gt;<br>
+&nbsp;&nbsp;&lt;style&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;h1 { color: #28a745; }<br>
+&nbsp;&nbsp;&lt;/style&gt;<br>
+&lt;/head&gt;<br>
+&lt;body&gt;<br>
+&nbsp;&nbsp;&lt;h1&gt;Hello World!&lt;/h1&gt;<br>
+&nbsp;&nbsp;&lt;p&gt;My website is hosted on GitHub Pages!&lt;/p&gt;<br>
+&nbsp;&nbsp;&lt;p&gt;Visit my GitHub profile: &lt;a href="https://github.com/cleverfox-77"&gt;cleverfox-77&lt;/a&gt;&lt;/p&gt;<br>
+&lt;/body&gt;<br>
+&lt;/html&gt;</code>
+                </div>
+                <button class="btn" onclick="copyCode()">Copy Sample Code</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>GitHub Website Upload Guide &copy; 2023 | Created for cleverfox-77</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = `<!DOCTYPE html>
+<html>
+<head>
+    <title>My First GitHub Website</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #28a745; }
+    </style>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>My website is hosted on GitHub Pages!</p>
+    <p>Visit my GitHub profile: <a href="https://github.com/cleverfox-77">cleverfox-77</a></p>
+</body>
+</html>`;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Sample code copied to clipboard! Paste it into an index.html file in your repository.');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
