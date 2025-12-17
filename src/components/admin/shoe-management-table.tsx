@@ -16,6 +16,7 @@ import { Edit, PlusCircle, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { Shoe } from '@/lib/types';
 import { ShoeForm } from './shoe-form';
+import { deleteProduct } from '@/lib/supabase';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,25 +43,25 @@ export function ShoeManagementTable({ shoes, onShoesUpdate }: ShoeManagementTabl
     setEditingShoe(null);
     setIsFormOpen(true);
   };
-  
+
   const handleEdit = (shoe: Shoe) => {
     setEditingShoe(shoe);
     setIsFormOpen(true);
   };
 
-  const handleDelete = (shoeId: string) => {
-    const updatedShoes = shoes.filter(s => s.id !== shoeId);
-    onShoesUpdate(updatedShoes);
-  };
-  
-  const handleFormSubmit = (shoe: Shoe) => {
-    let updatedShoes;
-    if (editingShoe) {
-      updatedShoes = shoes.map(s => s.id === shoe.id ? shoe : s);
+  const handleDelete = async (shoeId: string) => {
+    const success = await deleteProduct(shoeId);
+    if (success) {
+      // Trigger refresh in parent
+      onShoesUpdate([]);
     } else {
-      updatedShoes = [...shoes, shoe];
+      alert("Failed to delete product");
     }
-    onShoesUpdate(updatedShoes);
+  };
+
+  const handleFormSubmit = (shoe: Shoe) => {
+    // Shoe is already saved in Form, just close and refresh
+    onShoesUpdate([]); // Trigger refresh
     setIsFormOpen(false);
     setEditingShoe(null);
   };
@@ -126,11 +127,11 @@ export function ShoeManagementTable({ shoes, onShoesUpdate }: ShoeManagementTabl
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
-                       <AlertDialog>
+                      <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <Button aria-haspopup="true" size="icon" variant="destructive">
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
+                          <Button aria-haspopup="true" size="icon" variant="destructive">
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete</span>
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
