@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { shoes } from '@/lib/data';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '../ui/separator';
+import { uploadProductImage, saveProduct } from '@/lib/supabase';
+import { Loader2 } from 'lucide-react';
 
 interface ShoeFormProps {
   shoe?: Shoe | null;
@@ -21,13 +23,14 @@ interface ShoeFormProps {
 const productCategories = [...new Set(shoes.map(s => s.category))];
 
 export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<Partial<Shoe>>(
     shoe || {
       name: '',
       price: 0,
       description: '',
       details: [],
-      images: Array(4).fill('https://placehold.co/800x800.png'),
+      images: Array(4).fill(''), // Initialize with empty strings instead of placeholders if new
       category: '',
       stock: 0,
     }
@@ -50,28 +53,48 @@ export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
     setFormData(prev => ({ ...prev, details: value.split('\n') }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        const newImages = [...(formData.images || Array(4).fill('https://placehold.co/800x800.png'))];
-        newImages[index] = result;
-        setFormData(prev => ({...prev, images: newImages}));
-      };
-      reader.readAsDataURL(file);
+      setUploading(true);
+      try {
+        const publicUrl = await uploadProductImage(file);
+        if (publicUrl) {
+          const newImages = [...(formData.images || [])];
+          newImages[index] = publicUrl;
+          setFormData(prev => ({ ...prev, images: newImages }));
+        }
+      } catch (error) {
+        console.error("Upload failed", error);
+        alert("Failed to upload image");
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
+
+    // Fill in default placeholders if images are missing
+    const finalImages = formData.images?.map(img => img || 'https://placehold.co/800x800.png') || [];
+
     const newShoe: Shoe = {
       id: shoe?.id || `ll-shoe-${Date.now()}`,
       slug: shoe?.slug || formData.name!.toLowerCase().replace(/\s+/g, '-'),
       ...formData,
+      images: finalImages
     } as Shoe;
-    onSubmit(newShoe);
+
+    const savedShoe = await saveProduct(newShoe);
+    setUploading(false);
+
+    if (savedShoe) {
+      onSubmit(savedShoe);
+    } else {
+      alert("Failed to save product to database.");
+    }
   };
 
   return (
@@ -81,7 +104,7 @@ export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
           <CardTitle>{shoe ? 'Edit Shoe' : 'Add New Shoe'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-           <div className="space-y-2">
+          <div className="space-y-2">
             <Label className="font-semibold">Product Images</Label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[0, 1, 2, 3].map(index => (
@@ -94,11 +117,11 @@ export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">For demo purposes, these images are not uploaded to a server but stored with the product data.</p>
-           </div>
+            <p className="text-xs text-muted-foreground">Images are uploaded to Supabase Storage.</p>
+          </div>
 
           <Separator />
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -111,23 +134,23 @@ export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                 <Select onValueChange={handleCategoryChange} defaultValue={formData.category}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {productCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <Label htmlFor="category">Category</Label>
+              <Select onValueChange={handleCategoryChange} defaultValue={formData.category}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {productCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-             <div className="space-y-2">
-                <Label htmlFor="stock">Stock</Label>
-                <Input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} />
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} />
             </div>
           </div>
           <div className="space-y-2">
@@ -143,7 +166,10 @@ export function ShoeForm({ shoe, onSubmit, onCancel }: ShoeFormProps) {
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">{shoe ? 'Save Changes' : 'Add Shoe'}</Button>
+          <Button type="submit" disabled={uploading}>
+            {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {shoe ? 'Save Changes' : 'Add Shoe'}
+          </Button>
         </CardFooter>
       </form>
     </Card>

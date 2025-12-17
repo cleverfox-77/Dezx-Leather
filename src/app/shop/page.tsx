@@ -6,6 +6,7 @@ import { ProductCard } from '@/components/product-card';
 import { useAdmin } from '@/context/admin-context';
 import { ShoeManagementTable } from '@/components/admin/shoe-management-table';
 import { getShoes as getDefaultShoes } from '@/lib/data';
+import { fetchProducts } from '@/lib/supabase';
 import type { Shoe } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -18,25 +19,31 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q');
 
-  useEffect(() => {
-    const storedShoes = localStorage.getItem('shoes');
-    if (storedShoes) {
-      setAllShoes(JSON.parse(storedShoes));
+  const loadShoes = async () => {
+    const dbShoes = await fetchProducts();
+    if (dbShoes.length > 0) {
+      setAllShoes(dbShoes);
     } else {
-      const defaultShoes = getDefaultShoes();
-      setAllShoes(defaultShoes);
-      localStorage.setItem('shoes', JSON.stringify(defaultShoes));
+      // Fallback or seed? For now fallback to static
+      setAllShoes(getDefaultShoes());
     }
+  };
+
+  useEffect(() => {
+    loadShoes();
   }, []);
 
   const handleShoesUpdate = (updatedShoes: Shoe[]) => {
+    // This legacy prop might be used by children to optimistically update or we should just reload
+    // Use the updated list directly to avoid a network call if passed, 
+    // but ideally we should fetch fresh data to be sure.
+    // For now, let's accept the update to `allShoes` state to be snappy, but also maybe background refresh?
     setAllShoes(updatedShoes);
-    localStorage.setItem('shoes', JSON.stringify(updatedShoes));
-     toast({
-      title: "Success!",
-      description: "Your shoe collection has been updated.",
-    });
   };
+
+  const handleRefresh = () => {
+    loadShoes();
+  }
 
   const filteredShoes = useMemo(() => {
     if (!searchQuery) {
@@ -63,19 +70,19 @@ function ShopContent() {
     <div className="bg-background">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-headline font-bold">
-              {isAdmin ? 'Shoe Management' : 'Our Collection'}
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                {isAdmin 
-                  ? 'Add, edit, or remove products from your inventory.' 
-                  : 'Each pair is a masterpiece of design and craftsmanship, ready to be tailored to your unique preference.'
-                }
-            </p>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold">
+            {isAdmin ? 'Shoe Management' : 'Our Collection'}
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            {isAdmin
+              ? 'Add, edit, or remove products from your inventory.'
+              : 'Each pair is a masterpiece of design and craftsmanship, ready to be tailored to your unique preference.'
+            }
+          </p>
         </div>
 
         {isAdmin ? (
-          <ShoeManagementTable shoes={allShoes} onShoesUpdate={handleShoesUpdate} />
+          <ShoeManagementTable shoes={allShoes} onShoesUpdate={handleRefresh} />
         ) : (
           <div className="space-y-16">
             {searchQuery && filteredShoes.length === 0 && (

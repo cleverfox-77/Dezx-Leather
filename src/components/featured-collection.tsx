@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ProductCard } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
-import { getFeaturedShoes } from '@/lib/data'; // We'll still use this for types/fallback
+import { getFeaturedShoes } from '@/lib/data';
+import { fetchProducts } from '@/lib/supabase';
 import type { Shoe } from '@/lib/types';
 
 export function FeaturedCollection() {
@@ -12,27 +13,24 @@ export function FeaturedCollection() {
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        // 1. Try to get shoes from localStorage (User's "Admin" data)
-        const storedShoesRaw = localStorage.getItem('shoes');
-        let shoesToDisplay: Shoe[] = [];
+        async function loadShoes() {
+            // 1. Try to fetch from Supabase
+            const dbShoes = await fetchProducts();
 
-        if (storedShoesRaw) {
-            try {
-                const allShoes: Shoe[] = JSON.parse(storedShoesRaw);
-                // Shuffle and pick 4
-                shoesToDisplay = [...allShoes].sort(() => 0.5 - Math.random()).slice(0, 4);
-            } catch (e) {
-                console.error("Failed to parse stored shoes", e);
+            let shoesToDisplay: Shoe[] = [];
+
+            if (dbShoes.length > 0) {
+                shoesToDisplay = [...dbShoes].sort(() => 0.5 - Math.random()).slice(0, 4);
+            } else {
+                // 2. Fallback to static data
+                shoesToDisplay = getFeaturedShoes(4);
             }
+
+            setFeaturedShoes(shoesToDisplay);
+            setIsLoaded(true);
         }
 
-        // 2. Fallback to static data if no local storage or empty
-        if (shoesToDisplay.length === 0) {
-            shoesToDisplay = getFeaturedShoes(4);
-        }
-
-        setFeaturedShoes(shoesToDisplay);
-        setIsLoaded(true);
+        loadShoes();
     }, []);
 
     // Prevent hydration mismatch or layout shift by rendering a skeleton or null until loaded
