@@ -22,6 +22,20 @@ export async function fetchProducts(): Promise<Shoe[]> {
     return data as Shoe[] || [];
 }
 
+export async function fetchProductBySlug(slug: string): Promise<Shoe | null> {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+
+    if (error) {
+        console.error('Error fetching product by slug:', error);
+        return null;
+    }
+    return data as Shoe;
+}
+
 export async function uploadProductImage(file: File): Promise<string | null> {
     // Sanitize filename: remove special chars, emojis, keeping only alphanumeric, dots, hyphens, underscores
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').replace(/-+/g, '-');
