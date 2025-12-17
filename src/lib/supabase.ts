@@ -23,7 +23,11 @@ export async function fetchProducts(): Promise<Shoe[]> {
 }
 
 export async function uploadProductImage(file: File): Promise<string | null> {
-    const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
+    // Sanitize filename: remove special chars, emojis, keeping only alphanumeric, dots, hyphens, underscores
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-').replace(/-+/g, '-');
+    const shortName = sanitizedName.length > 50 ? sanitizedName.substring(sanitizedName.length - 50) : sanitizedName;
+    const fileName = `${Date.now()}-${shortName}`;
+
     const { data, error } = await supabase.storage
         .from('product-images')
         .upload(fileName, file);
