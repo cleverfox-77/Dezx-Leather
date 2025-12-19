@@ -86,7 +86,7 @@ export function Header() {
     setSearchQuery('');
     setIsSearchOpen(false);
   }
-  
+
   const handleSuggestionClick = (slug: string) => {
     router.push(`/products/${slug}`);
     setIsSearchOpen(false);
@@ -119,7 +119,7 @@ export function Header() {
             <Logo />
           </Link>
         </div>
-        
+
         {/* Mobile Menu */}
         <div className="md:hidden">
           <Sheet>
@@ -129,38 +129,55 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
-               <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-4">
                 <Link href="/" className="mb-4">
-                   <SheetClose asChild>
+                  <SheetClose asChild>
                     <Logo />
-                   </SheetClose>
+                  </SheetClose>
                 </Link>
                 {navLinks.map(link => (
-                  <SheetClose asChild key={link.href}>
-                    <Link href={link.href} className={cn(
-                      'text-lg',
-                      pathname === link.href ? 'text-primary font-semibold' : 'text-muted-foreground'
-                    )}>
-                      {link.label}
-                    </Link>
-                  </SheetClose>
+                  <div key={link.href}>
+                    <SheetClose asChild>
+                      <Link href={link.href} className={cn(
+                        'text-lg block mb-2',
+                        pathname === link.href ? 'text-primary font-semibold' : 'text-muted-foreground'
+                      )}>
+                        {link.label}
+                      </Link>
+                    </SheetClose>
+                    {/* Show categories under 'Shop' */}
+                    {link.label === 'Shop' && (
+                      <div className="pl-4 space-y-2 mb-2 border-l-2">
+                        {Array.from(new Set(allShoes.map(s => s.category))).map(category => (
+                          <SheetClose asChild key={category}>
+                            <Link
+                              href={`/shop?category=${encodeURIComponent(category)}`}
+                              className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+                            >
+                              {category}
+                            </Link>
+                          </SheetClose>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
-               </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
 
         <div className="flex flex-1 items-center justify-center md:justify-start">
-           <div className="md:hidden">
+          <div className="md:hidden">
             <Link href="/">
-                <Logo />
+              <Logo />
             </Link>
-           </div>
-           <div className="hidden md:flex">
+          </div>
+          <div className="hidden md:flex">
             <NavLinks />
-           </div>
+          </div>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
             <PopoverTrigger asChild>
@@ -170,7 +187,7 @@ export function Header() {
             </PopoverTrigger>
             <PopoverContent className="w-80">
               <form onSubmit={handleSearchSubmit}>
-                 <div className="grid gap-4">
+                <div className="grid gap-4">
                   <div className="space-y-2">
                     <h4 className="font-medium leading-none">Search Products</h4>
                     <p className="text-sm text-muted-foreground">
@@ -178,12 +195,12 @@ export function Header() {
                     </p>
                   </div>
                   <div className="grid gap-2">
-                    <Input 
-                      placeholder="e.g. Classic Oxford..." 
+                    <Input
+                      placeholder="e.g. Classic Oxford..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                     {suggestions.length > 0 && (
+                    {suggestions.length > 0 && (
                       <div className="mt-2 max-h-60 overflow-y-auto rounded-md border">
                         {suggestions.map(shoe => (
                           <div
@@ -191,7 +208,7 @@ export function Header() {
                             onClick={() => handleSuggestionClick(shoe.slug)}
                             className="flex items-center gap-4 p-2 hover:bg-accent cursor-pointer rounded-sm"
                           >
-                             <Image
+                            <Image
                               src={shoe.images[0]}
                               alt={shoe.name}
                               width={40}
@@ -209,13 +226,13 @@ export function Header() {
               </form>
             </PopoverContent>
           </Popover>
-          
-           <Button asChild variant="ghost" size="icon">
-                <Link href="/wishlist">
-                    <Heart className="h-5 w-5" />
-                </Link>
-           </Button>
-          
+
+          <Button asChild variant="ghost" size="icon">
+            <Link href="/wishlist">
+              <Heart className="h-5 w-5" />
+            </Link>
+          </Button>
+
           {isAdmin ? (
             <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut className="h-5 w-5" />
