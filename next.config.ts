@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         hostname: 'logowik.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'swczouobbdnorwgfpiee.supabase.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
