@@ -73,10 +73,8 @@ export default function CheckoutPage() {
 
       if (result.success) {
         // Clear cart
-        // We need to import dispatch from useCart, not just state
-        // But wait, useCart only exposes state and dispatch?
-        // Let's check imports.
-        // dispatch is not destructured above. Fix that first.
+        dispatch({ type: 'CLEAR_CART' });
+
         toast({
           title: "Order Placed Successfully!",
           description: "Check your email for confirmation.",
