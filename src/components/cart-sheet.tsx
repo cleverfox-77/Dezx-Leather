@@ -59,7 +59,7 @@ export function CartSheet({ open, onOpenChange, children }: CartSheetProps) {
                     <div className="flex-1">
                       <h4 className="font-semibold text-sm">{item.shoe.name}</h4>
                       <p className="text-xs text-muted-foreground">
-                        Size: {item.customization.shoeSize}, {item.customization.toeShape}, {item.customization.soleHeight || 'N/A'}" Sole
+                        Size: {item.customization.shoeSize}
                       </p>
                       <p className="text-sm font-medium mt-1">
                         BDT {item.shoe.price.toFixed(2)} x {item.quantity}

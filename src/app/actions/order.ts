@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
 export async function processOrder(order: Order) {
   // Defensive check in case env variables are not set.
   if (!SENDER_EMAIL || !SENDER_PASSWORD || !FROM_EMAIL) {
-     return { success: false, message: "Server email configuration is incomplete." };
+    return { success: false, message: "Server email configuration is incomplete." };
   }
 
   try {
@@ -38,7 +38,7 @@ export async function processOrder(order: Order) {
     // Here we simulate it with localStorage on the client and defaultShoes on the server.
     // This is a simplified approach for demonstration.
     // A robust implementation would use a proper database.
-    
+
     // The stock update logic should ideally be in a transactional database operation.
     // Since we don't have a DB, we can't reliably update stock server-side for this demo.
     // A proper implementation would look something like this:
@@ -57,7 +57,7 @@ export async function processOrder(order: Order) {
     //     await shoeRef.update({ stock: currentStock - item.quantity });
     //   }
     // });
-    
+
     // For now, we will assume the stock check happened on the client
     // and just proceed with sending emails. The stock will be updated
     // via localStorage on the client-side in the success page.
@@ -85,9 +85,7 @@ export async function processOrder(order: Order) {
               <tr>
                 <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.shoe.name} (x${item.quantity})</td>
                 <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 14px;">
-                  Size: ${item.customization.shoeSize}, 
-                  Foot Shape: ${item.customization.toeShape}, 
-                  Sole: ${item.customization.soleHeight || 'N/A'}"
+                  Size: ${item.customization.shoeSize}
                 </td>
                 <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">BDT ${item.shoe.price.toFixed(2)}</td>
               </tr>
@@ -97,10 +95,8 @@ export async function processOrder(order: Order) {
         <hr style="border: 1px solid #eee; margin: 20px 0;">
         <p style="text-align: right;"><strong>Subtotal:</strong> BDT ${order.subtotal.toFixed(2)}</p>
         <p style="text-align: right;"><strong>Shipping:</strong> BDT ${order.shipping.toFixed(2)}</p>
-        <h3 style="text-align: right; color: #1a1a1a;">Total: BDT ${order.total.toFixed(2)}</h3>
-        <p style="text-align: right;"><strong>Advance Paid:</strong> BDT ${order.advance.toFixed(2)}</p>
-        <p style="text-align: right; font-weight: bold; color: #D35400;">bKash TrxID: ${order.bkashTransactionId || 'N/A'}</p>
-        <p style="text-align: right;"><strong>Remaining Balance:</strong> BDT ${(order.total - order.advance).toFixed(2)}</p>
+        <h3 style="text-align: right; color: #1a1a1a;">Total Due: BDT ${order.total.toFixed(2)}</h3>
+        <p style="text-align: right; font-weight: bold; color: #D35400;">Payment Method: Cash on Delivery</p>
       </div>
     `;
 
@@ -111,7 +107,7 @@ export async function processOrder(order: Order) {
       subject: `New Order Confirmation - ${order.customer.name}`,
       html: adminEmailHtml,
     });
-    
+
     // Customer email sending is now disabled.
 
     return { success: true, message: "Order processed and admin notification sent successfully." };
