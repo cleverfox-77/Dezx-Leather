@@ -48,7 +48,7 @@ export const shoes: Shoe[] = [
     category: 'Derby',
     stock: 25
   },
-  
+
   // --- Loafers & Slip-ons ---
   {
     id: 'll-penny-loafer-001',
@@ -72,7 +72,7 @@ export const shoes: Shoe[] = [
     category: 'Loafer',
     stock: 18
   },
-   {
+  {
     id: 'll-driving-moc-001',
     name: 'The Driving Moccasin',
     slug: 'driving-moccasin',
@@ -107,7 +107,7 @@ export const shoes: Shoe[] = [
     category: 'Boot',
     stock: 16
   },
-   {
+  {
     id: 'll-jodhpur-boot-001',
     name: 'The Jodhpur Boot',
     slug: 'jodhpur-boot',
@@ -163,7 +163,4 @@ export const getFeaturedShoes = (count: number): Shoe[] => {
   return shuffled.slice(0, count);
 }
 
-export const toeShapes = ['Narrow', 'Regular', 'Wide'];
-export const shoeSizes = Array.from({ length: 6 }, (_, i) => 39 + i); // 39 to 44
-
-export const soleHeightOptions = Array.from({ length: 7 }, (_, i) => 2 + i * 0.5); // 2, 2.5, 3, 3.5, 4, 4.5, 5
+export const shoeSizes = Array.from({ length: 9 }, (_, i) => 39 + i); // 39 to 47

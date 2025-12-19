@@ -11,9 +11,7 @@ export type Shoe = {
 };
 
 export type Customization = {
-  toeShape: string;
   shoeSize: number | null;
-  soleHeight: number | null;
 };
 
 export type CartItem = {

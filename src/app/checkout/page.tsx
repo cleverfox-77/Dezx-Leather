@@ -31,8 +31,10 @@ const SHIPPING_COSTS = {
   outsideDhaka: 120.00,
 };
 
+import { processOrder } from '@/app/actions/order';
+
 export default function CheckoutPage() {
-  const { state } = useCart();
+  const { state, dispatch } = useCart();
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -53,7 +55,7 @@ export default function CheckoutPage() {
   const total = subtotal + shipping;
   const advanceAmount = subtotal * 0.5;
 
-  const handleProceedToPayment = (customerDetails: CustomerDetails) => {
+  const handleConfirmOrder = async (customerDetails: CustomerDetails) => {
     setIsLoading(true);
 
     const orderDetails = {
@@ -62,25 +64,42 @@ export default function CheckoutPage() {
       subtotal,
       shipping,
       total,
-      advance: advanceAmount,
+      advance: 0, // No advance payment flow
+      // No transaction ID needed for direct order
     };
-    
-    sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
 
-    toast({
-      title: "Proceeding to Payment",
-      description: "Redirecting to our secure payment gateway...",
-    });
+    try {
+      const result = await processOrder(orderDetails);
 
-    // Short delay to allow toast to show
-    setTimeout(() => {
-        router.push('/payment/bkash');
-    }, 2000);
+      if (result.success) {
+        // Clear cart
+        dispatch({ type: 'CLEAR_CART' });
+
+        toast({
+          title: "Order Placed Successfully!",
+          description: "Check your email for confirmation.",
+        });
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      } else {
+        throw new Error(result.message);
+      }
+
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Order Failed",
+        description: error.message || "Failed to place order.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
+
   if (state.items.length === 0 && !isLoading) {
     return (
-       <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
+      <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Your Cart is Empty</AlertTitle>
@@ -105,7 +124,7 @@ export default function CheckoutPage() {
               <div>
                 <h3 className="text-xl font-headline mb-4">Shipping Information</h3>
                 <FormProvider {...form}>
-                  <form onSubmit={form.handleSubmit(handleProceedToPayment)} id="customer-details-form" className="space-y-4">
+                  <form onSubmit={form.handleSubmit(handleConfirmOrder)} id="customer-details-form" className="space-y-4">
                     <FormField
                       control={form.control}
                       name="name"
@@ -132,7 +151,7 @@ export default function CheckoutPage() {
                         </FormItem>
                       )}
                     />
-                     <FormField
+                    <FormField
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
@@ -158,30 +177,30 @@ export default function CheckoutPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormItem>
-                        <FormLabel>Shipping Location</FormLabel>
-                        <RadioGroup
-                            onValueChange={(value: 'insideDhaka' | 'outsideDhaka') => setShippingLocation(value)}
-                            defaultValue={shippingLocation}
-                            className="flex gap-4 pt-2"
-                        >
-                            <FormItem className="flex items-center space-x-2">
-                                <RadioGroupItem value="insideDhaka" id="insideDhaka" />
-                                <Label htmlFor="insideDhaka">Inside Dhaka (BDT {SHIPPING_COSTS.insideDhaka.toFixed(2)})</Label>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-2">
-                                <RadioGroupItem value="outsideDhaka" id="outsideDhaka" />
-                                <Label htmlFor="outsideDhaka">Outside Dhaka (BDT {SHIPPING_COSTS.outsideDhaka.toFixed(2)})</Label>
-                            </FormItem>
-                        </RadioGroup>
+                      <FormLabel>Shipping Location</FormLabel>
+                      <RadioGroup
+                        onValueChange={(value: 'insideDhaka' | 'outsideDhaka') => setShippingLocation(value)}
+                        defaultValue={shippingLocation}
+                        className="flex gap-4 pt-2"
+                      >
+                        <FormItem className="flex items-center space-x-2">
+                          <RadioGroupItem value="insideDhaka" id="insideDhaka" />
+                          <Label htmlFor="insideDhaka">Inside Dhaka (BDT {SHIPPING_COSTS.insideDhaka.toFixed(2)})</Label>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2">
+                          <RadioGroupItem value="outsideDhaka" id="outsideDhaka" />
+                          <Label htmlFor="outsideDhaka">Outside Dhaka (BDT {SHIPPING_COSTS.outsideDhaka.toFixed(2)})</Label>
+                        </FormItem>
+                      </RadioGroup>
                     </FormItem>
                   </form>
                 </FormProvider>
               </div>
 
               <div className="space-y-6">
-                 <h3 className="text-xl font-headline mb-4">Order Summary</h3>
+                <h3 className="text-xl font-headline mb-4">Order Summary</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
@@ -197,14 +216,12 @@ export default function CheckoutPage() {
                     <span>BDT {total.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <Separator />
 
                 <div className="space-y-2 text-center bg-secondary p-4 rounded-lg">
-                  <h3 className="font-semibold text-lg">Advance Payment Required (50%)</h3>
-                  <p className="text-muted-foreground">To confirm your custom order, we require an advance payment.</p>
-                  <p className="text-3xl font-bold text-accent">BDT {advanceAmount.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">The remaining balance of BDT {(total - advanceAmount).toFixed(2)} will be due upon delivery.</p>
+                  <h3 className="font-semibold text-lg">Cash on Delivery</h3>
+                  <p className="text-muted-foreground">Pay the full amount of BDT {total.toFixed(2)} when you receive your order.</p>
                 </div>
                 <div className="text-center text-sm text-muted-foreground">
                   <b>We make each pair of shoes specially for you, focusing on proper customization and careful crafting. Because of this process, orders take a minimum of 2 weeks and up to 3 weeks to complete.</b>
@@ -214,7 +231,7 @@ export default function CheckoutPage() {
           </CardContent>
           <CardFooter>
             <Button size="lg" className="w-full" type="submit" form="customer-details-form" disabled={isLoading || state.items.length === 0}>
-              {isLoading ? 'Processing...' : `Proceed to Pay BDT ${advanceAmount.toFixed(2)}`}
+              {isLoading ? 'Processing...' : `Confirm Order - BDT ${total.toFixed(2)}`}
             </Button>
           </CardFooter>
         </Card>

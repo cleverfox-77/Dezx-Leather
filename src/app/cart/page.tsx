@@ -31,21 +31,21 @@ export default function CartPage() {
   const updateQuantity = (id: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
   };
-  
+
   const removeItem = (id: string) => {
     dispatch({ type: 'REMOVE_ITEM', payload: { id } });
   };
 
   if (state.items.length === 0) {
     return (
-        <div className="container mx-auto px-4 py-24 text-center">
-            <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground" />
-            <h1 className="mt-8 text-4xl font-headline">Your Cart is Empty</h1>
-            <p className="mt-4 text-muted-foreground">Looks like you haven't added any masterpieces yet.</p>
-            <Button asChild className="mt-8">
-                <Link href="/shop">Start Shopping</Link>
-            </Button>
-        </div>
+      <div className="container mx-auto px-4 py-24 text-center">
+        <ShoppingCart className="mx-auto h-24 w-24 text-muted-foreground" />
+        <h1 className="mt-8 text-4xl font-headline">Your Cart is Empty</h1>
+        <p className="mt-4 text-muted-foreground">Looks like you haven't added any masterpieces yet.</p>
+        <Button asChild className="mt-8">
+          <Link href="/shop">Start Shopping</Link>
+        </Button>
+      </div>
     )
   }
 
@@ -54,83 +54,83 @@ export default function CartPage() {
       <h1 className="text-4xl font-headline text-center mb-12">Shopping Cart</h1>
       <div className="grid lg:grid-cols-3 gap-12 items-start">
         <div className="lg:col-span-2">
-            <Card>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[100px] hidden md:table-cell">Product</TableHead>
-                            <TableHead>Details</TableHead>
-                            <TableHead className="text-center">Quantity</TableHead>
-                            <TableHead className="text-right">Total</TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {state.items.map((item) => (
-                            <TableRow key={item.id}>
-                            <TableCell className="hidden md:table-cell">
-                                <Image
-                                src={item.shoe.images[0]}
-                                alt={item.shoe.name}
-                                width={80}
-                                height={80}
-                                className="rounded-md object-cover"
-                                data-ai-hint="leather shoe"
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <p className="font-semibold">{item.shoe.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  Size: {item.customization.shoeSize}, Foot Shape: {item.customization.toeShape}, {item.customization.soleHeight || 'N/A'}" Sole
-                                </p>
-                                <p className="text-sm md:hidden mt-1">BDT {item.shoe.price.toFixed(2)}</p>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex items-center justify-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                >
-                                    <Minus className="h-4 w-4" />
-                                </Button>
-                                <Input
-                                    type="number"
-                                    value={item.quantity}
-                                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
-                                    className="w-14 h-8 text-center"
-                                />
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </Button>
-                                </div>
-                            </TableCell>
-                            <TableCell className="text-right font-medium">
-                                BDT {(item.shoe.price * item.quantity).toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-muted-foreground"
-                                    onClick={() => removeItem(item.id)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px] hidden md:table-cell">Product</TableHead>
+                    <TableHead>Details</TableHead>
+                    <TableHead className="text-center">Quantity</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {state.items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="hidden md:table-cell">
+                        <Image
+                          src={item.shoe.images[0]}
+                          alt={item.shoe.name}
+                          width={80}
+                          height={80}
+                          className="rounded-md object-cover"
+                          data-ai-hint="leather shoe"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <p className="font-semibold">{item.shoe.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Size: {item.customization.shoeSize}
+                        </p>
+                        <p className="text-sm md:hidden mt-1">BDT {item.shoe.price.toFixed(2)}</p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                            className="w-14 h-8 text-center"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        BDT {(item.shoe.price * item.quantity).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-muted-foreground"
+                          onClick={() => removeItem(item.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
         <div className="lg:col-span-1">
           <Card>
@@ -159,6 +159,6 @@ export default function CartPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

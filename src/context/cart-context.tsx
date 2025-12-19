@@ -23,7 +23,7 @@ const CartContext = createContext<{
 } | undefined>(undefined);
 
 const generateItemId = (shoeId: string, customization: Customization): string => {
-  return `${shoeId}-${customization.shoeSize}-${customization.toeShape.replace(/\s/g, '')}-${customization.soleHeight}`;
+  return `${shoeId}-${customization.shoeSize}`;
 };
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
